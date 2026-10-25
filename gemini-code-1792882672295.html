@@ -1,0 +1,1624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BUN & CRAFT — 3D Claymorphic Experience</title>
+
+  <!-- Google Fonts: Inter & Fira Code -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@500;700&family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    /* ==========================================================================
+       1. CSS VARIABLES & THEME SETUP
+       ========================================================================== */
+    :root {
+      --bg-gradient-day: linear-gradient(135deg, #4162e6 0%, #334ec4 100%);
+      --bg-gradient-night: linear-gradient(135deg, #0a0d1d 0%, #03050c 100%);
+
+      --accent-yellow: #ffea79;
+      --accent-orange: #ffb830;
+      --accent-pink: #ff5e7e;
+      --accent-green: #38ef7d;
+
+      --font-inter: 'Inter', sans-serif;
+      --font-mono: 'Fira Code', monospace;
+
+      --theme-transition: background 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      width: 100%;
+      min-height: 100vh;
+      overflow-x: hidden;
+      background: #03050c;
+      -webkit-font-smoothing: antialiased;
+      user-select: none;
+      font-family: var(--font-inter);
+    }
+
+    /* Focus rings for keyboard accessibility */
+    a:focus-visible, button:focus-visible {
+      outline: 3px solid var(--accent-yellow);
+      outline-offset: 4px;
+    }
+
+    /* Hero Outer Wrapper */
+    .hero-wrapper {
+      position: relative;
+      width: 100%;
+      min-height: 100vh;
+      background: var(--bg-gradient-day);
+      transition: var(--theme-transition);
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    body.lamp-off .hero-wrapper {
+      background: var(--bg-gradient-night);
+    }
+
+    /* Living Canvas Layer (Hero Scope) */
+    #bg-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* Ambient Soft Color Glows in Hero */
+    .glow-orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(90px);
+      opacity: 0.35;
+      pointer-events: none;
+      z-index: 0;
+      transition: opacity 0.7s ease, transform 0.2s cubic-bezier(0.1, 1, 0.1, 1);
+    }
+    .glow-1 { top: 10%; left: 15%; width: 380px; height: 380px; background: var(--accent-orange); }
+    .glow-2 { top: 45%; right: 15%; width: 420px; height: 420px; background: var(--accent-pink); }
+    .glow-3 { bottom: 10%; left: 35%; width: 360px; height: 360px; background: var(--accent-green); }
+
+    body.lamp-off .glow-orb {
+      opacity: 0.08;
+    }
+
+    /* Subtle Mouse Cursor Spotlight in Hero */
+    .spotlight {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+      background: radial-gradient(700px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255,255,255,0.06), transparent 80%);
+    }
+
+    /* ==========================================================================
+       2. HERO GRID LAYOUT & CLEAN BOLD 3D CLAYMORTIC TYPOGRAPHY
+       ========================================================================== */
+    .hero-section {
+      position: relative;
+      width: 100%;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 5;
+    }
+
+    .hero-layout {
+      position: relative;
+      z-index: 5;
+      width: 100%;
+      max-width: 1280px;
+      padding: 2rem;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      gap: 2rem;
+    }
+
+    /* Left Side: Clean Bold 3D Claymorphic Restaurant Title */
+    .brand-section {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+      perspective: 1000px;
+      z-index: 6;
+    }
+
+    .brand-title-container {
+      display: flex;
+      flex-direction: column;
+      transform-style: preserve-3d;
+      transition: transform 0.15s ease-out;
+      will-change: transform;
+    }
+
+    .clay-text {
+      font-size: clamp(3.8rem, 7.5vw, 7.2rem);
+      font-weight: 900;
+      line-height: 0.9;
+      letter-spacing: -0.03em;
+      text-transform: uppercase;
+      color: #fff7ed;
+      text-shadow:
+        0 3px 0 #fbbf24,
+        0 6px 0 #d97706,
+        0 9px 0 #b45309,
+        0 12px 0 #78350f,
+        0 18px 32px rgba(3, 5, 12, 0.45);
+      position: relative;
+      transition: text-shadow 0.5s ease, color 0.5s ease;
+    }
+
+    body.lamp-off .clay-text {
+      color: #fef3c7;
+      text-shadow:
+        0 3px 0 #d97706,
+        0 6px 0 #92400e,
+        0 9px 0 #451a03,
+        0 16px 36px rgba(0, 0, 0, 0.85);
+    }
+
+    .clay-text-accent {
+      color: var(--accent-yellow);
+      text-shadow:
+        0 3px 0 #f59e0b,
+        0 6px 0 #b45309,
+        0 9px 0 #78350f,
+        0 16px 28px rgba(3, 5, 12, 0.4);
+    }
+
+    /* Right Side: Burger & Lamp Canvas Scene Container */
+    .scene-container {
+      flex: 1.2;
+      position: relative;
+      width: 100%;
+      max-width: 720px;
+      aspect-ratio: 4 / 3;
+      perspective: 1000px;
+    }
+
+    .scene-wrapper {
+      width: 100%;
+      height: 100%;
+      transform-style: preserve-3d;
+      transition: transform 0.12s ease-out;
+      will-change: transform;
+    }
+
+    .scene-svg {
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+    }
+
+    /* Lamp Switch & Cord Hover Styling */
+    #lamp-switch-group {
+      cursor: pointer;
+    }
+
+    #lamp-switch-group:hover #lamp-head {
+      filter: drop-shadow(0 0 16px rgba(255, 234, 121, 0.85));
+    }
+
+    #lamp-cord-line {
+      transform-origin: 400px 115px;
+      animation: cordSway 3.5s ease-in-out infinite alternate;
+    }
+
+    @keyframes cordSway {
+      0% { transform: rotate(-2.5deg); }
+      100% { transform: rotate(2.5deg); }
+    }
+
+    /* Smooth Light Beam Transitions */
+    .lamp-beam-element {
+      transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+      pointer-events: none;
+    }
+
+    body.lamp-off .lamp-beam-element {
+      opacity: 0 !important;
+    }
+
+    /* Burger Idle Floating Motion */
+    .burger-mascot {
+      animation: burgerFloat 3.8s ease-in-out infinite alternate;
+      transform-origin: center bottom;
+    }
+
+    @keyframes burgerFloat {
+      0% { transform: translateY(0px) scale(1); }
+      100% { transform: translateY(-9px) scale(1.012); }
+    }
+
+    /* Corn on Cob Gentle Wobble Animation */
+    .corn-side {
+      animation: cornWobble 4.2s ease-in-out infinite alternate;
+      transform-origin: center bottom;
+    }
+
+    @keyframes cornWobble {
+      0% { transform: translateY(0px) rotate(0deg); }
+      100% { transform: translateY(-5px) rotate(-2deg); }
+    }
+
+    /* Eye Blink Animation */
+    .burger-eye {
+      animation: eyeBlink 4.2s infinite;
+      transform-origin: center;
+    }
+
+    @keyframes eyeBlink {
+      0%, 93%, 97%, 100% { transform: scaleY(1); }
+      95% { transform: scaleY(0.1); }
+    }
+
+    /* Steam Animation */
+    .steam-line {
+      stroke-dasharray: 20;
+      animation: steamUp 2.8s linear infinite;
+    }
+
+    @keyframes steamUp {
+      0% { stroke-dashoffset: 40; opacity: 0; }
+      50% { opacity: 0.5; }
+      100% { stroke-dashoffset: 0; opacity: 0; }
+    }
+
+    /* Floating Badges Motion */
+    .floating-badge {
+      animation: badgeFloat 4s ease-in-out infinite alternate;
+    }
+    .badge-left { animation-delay: 0s; }
+    .badge-right { animation-delay: 2s; }
+
+    @keyframes badgeFloat {
+      0% { transform: translateY(0px) rotate(0deg); }
+      100% { transform: translateY(-12px) rotate(5deg); }
+    }
+
+    /* Scroll Down Hint */
+    .scroll-down-hint {
+      position: absolute;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 0.85rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      cursor: pointer;
+      z-index: 10;
+      animation: hintBounce 2s infinite;
+      text-decoration: none;
+    }
+
+    .scroll-down-hint svg {
+      width: 24px;
+      height: 24px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 3;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    @keyframes hintBounce {
+      0%, 20%, 50%, 80%, 100% { transform: translate(-50%, 0); }
+      40% { transform: translate(-50%, -8px); }
+      60% { transform: translate(-50%, -4px); }
+    }
+
+    /* ==========================================================================
+       3. ABOUT SECTION (CRISP WHITE BACKGROUND + TOAST CHARACTER & TYPING)
+       ========================================================================== */
+    .about-section {
+      position: relative;
+      width: 100%;
+      background: #ffffff;
+      padding: 6rem 2rem;
+      z-index: 10;
+      box-shadow: 0 -20px 40px rgba(0,0,0,0.12);
+      border-top: 1px solid rgba(229, 231, 235, 0.8);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .about-container {
+      width: 100%;
+      max-width: 1200px;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      gap: 4rem;
+    }
+
+    .about-character-box {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
+
+    .about-character-svg {
+      width: 100%;
+      max-width: 360px;
+      height: auto;
+      filter: drop-shadow(0 20px 25px rgba(51, 78, 196, 0.18));
+      animation: toastFloat 4s ease-in-out infinite alternate;
+    }
+
+    @keyframes toastFloat {
+      0% { transform: translateY(0px) rotate(0deg); }
+      100% { transform: translateY(-10px) rotate(2deg); }
+    }
+
+    .about-content-box {
+      flex: 1.2;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .about-badge {
+      display: inline-block;
+      background: #eff6ff;
+      color: #2563eb;
+      font-size: 0.85rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      padding: 0.4rem 1.1rem;
+      border-radius: 20px;
+      margin-bottom: 1rem;
+    }
+
+    .about-title {
+      font-size: clamp(2.2rem, 4vw, 3.5rem);
+      font-weight: 900;
+      color: #0f172a;
+      text-transform: uppercase;
+      letter-spacing: -0.02em;
+      line-height: 1.05;
+      margin-bottom: 1.5rem;
+    }
+
+    /* Typing Animation Box */
+    .about-typing-wrapper {
+      font-family: var(--font-mono);
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #334155;
+      line-height: 1.6;
+      min-height: 5rem;
+    }
+
+    .typing-text {
+      border-right: 3px solid #2563eb;
+      white-space: pre-wrap;
+      word-break: break-word;
+      animation: blink-caret 0.75s step-end infinite;
+    }
+
+    @keyframes blink-caret {
+      from, to { border-color: transparent; }
+      50% { border-color: #2563eb; }
+    }
+
+    @media (max-width: 900px) {
+      .about-container {
+        flex-direction: column;
+        text-align: center;
+        gap: 2.5rem;
+      }
+      .about-content-box {
+        align-items: center;
+      }
+    }
+
+    /* ==========================================================================
+       4. CRISP WHITE MENU SECTION WITH 3D COVERFLOW CARD SLIDER
+       ========================================================================== */
+    .menu-section {
+      position: relative;
+      width: 100%;
+      background: #f8fafc;
+      padding: 6rem 0 7rem 0;
+      z-index: 10;
+      border-top: 1px solid rgba(229, 231, 235, 0.8);
+      overflow: hidden;
+    }
+
+    .menu-container {
+      width: 100%;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .menu-header {
+      text-align: center;
+      max-width: 650px;
+      margin-bottom: 3rem;
+    }
+
+    .menu-badge {
+      display: inline-block;
+      background: #eff6ff;
+      color: #2563eb;
+      font-size: 0.85rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      padding: 0.4rem 1.1rem;
+      border-radius: 20px;
+      margin-bottom: 1rem;
+    }
+
+    .menu-title {
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      font-weight: 900;
+      color: #0f172a;
+      text-transform: uppercase;
+      letter-spacing: -0.02em;
+      line-height: 1.05;
+      margin-bottom: 0.8rem;
+    }
+
+    .menu-subtitle {
+      font-size: 1.1rem;
+      color: #64748b;
+      font-weight: 500;
+      line-height: 1.5;
+    }
+
+    /* 3D Coverflow Viewport */
+    .coverflow-viewport {
+      position: relative;
+      width: 100%;
+      height: 520px;
+      perspective: 1200px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 2rem;
+    }
+
+    /* 3D Coverflow Track */
+    .coverflow-track {
+      position: relative;
+      width: 320px;
+      height: 480px;
+      transform-style: preserve-3d;
+    }
+
+    /* 3D Claymorphic Menu Card */
+    .coverflow-card {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 320px;
+      height: 480px;
+      background: #ffffff;
+      border-radius: 28px;
+      padding: 1.8rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      /* Soft Claymorphic Outer & Inner Shadow */
+      box-shadow: 
+        0 20px 35px -10px rgba(51, 78, 196, 0.14),
+        0 10px 15px -5px rgba(0, 0, 0, 0.04),
+        inset 0 2px 4px rgba(255, 255, 255, 1),
+        inset 0 -4px 8px rgba(0, 0, 0, 0.03);
+      border: 1px solid rgba(241, 245, 249, 0.95);
+      cursor: pointer;
+      transition: transform 0.6s cubic-bezier(0.25, 1, 0.3, 1), opacity 0.6s ease, filter 0.6s ease;
+      will-change: transform, opacity;
+      transform-origin: center center;
+    }
+
+    /* Card Food SVG Illustration Box */
+    .card-img-box {
+      width: 100%;
+      height: 210px;
+      background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+      border-radius: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      margin-bottom: 1.2rem;
+      box-shadow: inset 0 2px 6px rgba(0,0,0,0.04);
+      overflow: hidden;
+    }
+
+    .card-img-box svg {
+      width: 82%;
+      height: 82%;
+      filter: drop-shadow(0 12px 16px rgba(0,0,0,0.16));
+      transition: transform 0.4s ease;
+    }
+
+    .coverflow-card.active:hover .card-img-box svg {
+      transform: scale(1.08) rotate(-2deg);
+    }
+
+    /* Puffy Clay Price Tag */
+    .card-price-tag {
+      position: absolute;
+      top: 0.9rem;
+      right: 0.9rem;
+      background: var(--accent-orange);
+      color: #451a03;
+      font-weight: 900;
+      font-size: 1.15rem;
+      padding: 0.4rem 1rem;
+      border-radius: 50px;
+      box-shadow: 
+        0 6px 12px rgba(217, 119, 6, 0.3),
+        inset 0 2px 4px rgba(255, 255, 255, 0.7);
+      border: 2px solid #ffffff;
+      transform: rotate(3deg);
+    }
+
+    /* Card Content */
+    .card-body {
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+      justify-content: space-between;
+    }
+
+    .card-item-title {
+      font-size: 1.45rem;
+      font-weight: 900;
+      color: #0f172a;
+      text-transform: uppercase;
+      letter-spacing: -0.01em;
+      margin-bottom: 0.4rem;
+    }
+
+    .card-item-desc {
+      font-size: 0.88rem;
+      color: #64748b;
+      line-height: 1.45;
+      margin-bottom: 1.4rem;
+      font-weight: 500;
+    }
+
+    /* Order Now Action Button */
+    .order-now-btn {
+      width: 100%;
+      background: linear-gradient(135deg, #4162e6 0%, #334ec4 100%);
+      color: #ffffff;
+      border: none;
+      font-size: 0.95rem;
+      font-weight: 800;
+      padding: 0.85rem 1.2rem;
+      border-radius: 16px;
+      cursor: pointer;
+      box-shadow: 
+        0 8px 18px rgba(51, 78, 196, 0.32),
+        inset 0 2px 4px rgba(255, 255, 255, 0.4);
+      transition: all 0.25s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .order-now-btn:hover {
+      background: linear-gradient(135deg, #3b57d6 0%, #2b43b3 100%);
+      transform: translateY(-2px);
+      box-shadow: 
+        0 12px 24px rgba(51, 78, 196, 0.42),
+        inset 0 2px 4px rgba(255, 255, 255, 0.6);
+    }
+
+    .order-now-btn:active {
+      transform: translateY(1px);
+    }
+
+    /* Navigation Controls & Pagination Dots */
+    .coverflow-controls {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 2rem;
+      z-index: 20;
+    }
+
+    .coverflow-nav-btn {
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      background: #ffffff;
+      border: 2px solid #f1f5f9;
+      color: #0f172a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 
+        0 10px 25px rgba(0, 0, 0, 0.1),
+        inset 0 2px 4px rgba(255, 255, 255, 1);
+      transition: all 0.25s ease;
+    }
+
+    .coverflow-nav-btn:hover {
+      background: #4162e6;
+      color: #ffffff;
+      border-color: #4162e6;
+      transform: scale(1.08);
+      box-shadow: 0 14px 28px rgba(65, 98, 230, 0.35);
+    }
+
+    .coverflow-nav-btn:active {
+      transform: scale(0.95);
+    }
+
+    .coverflow-nav-btn svg {
+      width: 24px;
+      height: 24px;
+      stroke-width: 3;
+    }
+
+    .coverflow-dots {
+      display: flex;
+      gap: 0.6rem;
+      align-items: center;
+    }
+
+    .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #cbd5e1;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .dot.active {
+      width: 32px;
+      border-radius: 20px;
+      background: #4162e6;
+    }
+
+    @media (max-width: 900px) {
+      .hero-layout {
+        flex-direction: column;
+        justify-content: center;
+        text-align: center;
+        gap: 1.5rem;
+        padding: 1.5rem;
+      }
+      .brand-section {
+        align-items: center;
+      }
+      .scene-container {
+        max-width: 520px;
+      }
+      .menu-section {
+        padding: 4rem 0 5rem 0;
+      }
+      .coverflow-viewport {
+        height: 480px;
+      }
+      .coverflow-track, .coverflow-card {
+        width: 280px;
+        height: 440px;
+      }
+      .card-img-box {
+        height: 180px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, ::before, ::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ==========================================================================
+     1. HERO SECTION (Periwinkle Living Canvas + Interactive Lamp Scene)
+     ========================================================================== -->
+  <div class="hero-wrapper" id="hero-wrapper">
+    <!-- Living Canvas Background -->
+    <canvas id="bg-canvas"></canvas>
+
+    <!-- Ambient Soft Color Glow Orbs -->
+    <div class="glow-orb glow-1" id="glow-1"></div>
+    <div class="glow-orb glow-2" id="glow-2"></div>
+    <div class="glow-orb glow-3" id="glow-3"></div>
+    <div class="spotlight" id="spotlight"></div>
+
+    <section class="hero-section">
+      <main class="hero-layout">
+        
+        <!-- LEFT SIDE: Clean 3D Claymorphic Restaurant Title -->
+        <div class="brand-section">
+          <div class="brand-title-container" id="brand-title-container">
+            <h1 class="clay-text">BUN <span class="clay-text-accent">&amp;</span></h1>
+            <h1 class="clay-text">CRAFT</h1>
+          </div>
+        </div>
+
+        <!-- RIGHT SIDE: Burger Mascot, Corn on the Cob & Lamp Spotlight Scene -->
+        <div class="scene-container" id="scene-container">
+          <div class="scene-wrapper" id="scene-wrapper">
+            <svg class="scene-svg" viewBox="0 0 800 600" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <!-- Conical Light Beam Gradient -->
+                <linearGradient id="light-beam-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stop-color="#ffea79" stop-opacity="0.85"/>
+                  <stop offset="35%" stop-color="#ffea79" stop-opacity="0.45"/>
+                  <stop offset="100%" stop-color="#ffea79" stop-opacity="0.0"/>
+                </linearGradient>
+
+                <!-- Radial Light Pool Gradient on Desk -->
+                <radialGradient id="desk-light-pool" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stop-color="#ffea79" stop-opacity="0.75"/>
+                  <stop offset="50%" stop-color="#ffb830" stop-opacity="0.35"/>
+                  <stop offset="100%" stop-color="#ffb830" stop-opacity="0"/>
+                </radialGradient>
+
+                <!-- Soft Clay Drop Shadow Filter -->
+                <filter id="clay-shadow" x="-20%" y="-20%" width="140%" height="140%">
+                  <feDropShadow dx="0" dy="16" stdDeviation="12" flood-color="#050814" flood-opacity="0.32"/>
+                </filter>
+
+                <!-- Bun Top Gradient -->
+                <linearGradient id="bun-top-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stop-color="#fde047"/>
+                  <stop offset="100%" stop-color="#d97706"/>
+                </linearGradient>
+
+                <!-- Bun Bottom Gradient -->
+                <linearGradient id="bun-bottom-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stop-color="#fbbf24"/>
+                  <stop offset="100%" stop-color="#b45309"/>
+                </linearGradient>
+
+                <!-- Patty Gradient -->
+                <linearGradient id="patty-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stop-color="#78350f"/>
+                  <stop offset="100%" stop-color="#3f1d0b"/>
+                </linearGradient>
+
+                <!-- Cheese Gradient -->
+                <linearGradient id="cheese-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#fef08a"/>
+                  <stop offset="100%" stop-color="#eab308"/>
+                </linearGradient>
+
+                <!-- Corn Body Gradient -->
+                <linearGradient id="corn-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stop-color="#fef08a"/>
+                  <stop offset="50%" stop-color="#eab308"/>
+                  <stop offset="100%" stop-color="#ca8a04"/>
+                </linearGradient>
+
+                <!-- Corn Husk/Stalk Gradient -->
+                <linearGradient id="husk-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="#4ade80"/>
+                  <stop offset="100%" stop-color="#15803d"/>
+                </linearGradient>
+
+                <!-- Desk Surface Gradient -->
+                <linearGradient id="desk-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stop-color="#ffffff" stop-opacity="0.95"/>
+                  <stop offset="100%" stop-color="#cbd5e1" stop-opacity="0.85"/>
+                </linearGradient>
+              </defs>
+
+              <!-- LAMP LIGHT BEAM OVERLAY -->
+              <g id="lamp-light-layer">
+                <polygon class="lamp-beam-element" points="400,115 110,510 690,510" fill="url(#light-beam-grad)" opacity="0.85"/>
+                <polygon class="lamp-beam-element" points="400,115 230,510 570,510" fill="url(#light-beam-grad)" opacity="0.5"/>
+                <ellipse class="lamp-beam-element" cx="400" cy="410" rx="260" ry="110" fill="url(#desk-light-pool)" opacity="0.9"/>
+              </g>
+
+              <!-- DESK & FLOOR SHADOW -->
+              <ellipse cx="400" cy="535" rx="360" ry="22" fill="#03050c" opacity="0.4"/>
+              <rect x="90" y="460" width="620" height="22" rx="11" fill="url(#desk-grad)" filter="url(#clay-shadow)"/>
+              <rect x="160" y="482" width="28" height="85" rx="8" fill="#2d3f99"/>
+              <rect x="612" y="482" width="28" height="85" rx="8" fill="#2d3f99"/>
+
+              <!-- CENTRAL CLAYMORTIC BURGER MASCOT -->
+              <g class="burger-mascot" filter="url(#clay-shadow)">
+                <ellipse cx="370" cy="466" rx="110" ry="18" fill="#000000" opacity="0.32"/>
+                <rect x="260" y="415" width="220" height="46" rx="23" fill="url(#bun-bottom-grad)"/>
+                <rect x="275" y="418" width="190" height="10" rx="5" fill="#fef3c7" opacity="0.35"/>
+                <path d="M242 412 Q265 426 288 412 Q311 426 334 412 Q357 426 380 412 Q403 426 426 412 Q449 426 472 412 Q495 426 500 412 L490 424 L250 424 Z" fill="#22c55e"/>
+                <rect x="252" y="378" width="236" height="38" rx="19" fill="url(#patty-grad)"/>
+                <path d="M244 368 L496 368 L472 400 L442 378 L388 404 L340 372 L296 396 L266 372 Z" fill="url(#cheese-grad)"/>
+                <rect x="258" y="344" width="224" height="24" rx="12" fill="#ff5e7e"/>
+                <rect x="278" y="347" width="184" height="5" rx="2.5" fill="#ffffff" opacity="0.45"/>
+                <path d="M240 336 Q268 350 296 336 Q324 350 352 336 Q380 350 408 336 Q436 350 464 336 Q492 350 504 336 L492 346 L252 346 Z" fill="#38ef7d"/>
+                <path d="M244 332 C244 220, 496 220, 496 332 Z" fill="url(#bun-top-grad)"/>
+                <path d="M280 278 C302 252, 418 252, 440 278 C394 262, 326 262, 280 278 Z" fill="#ffffff" opacity="0.55"/>
+
+                <!-- Sesame Seeds -->
+                <ellipse cx="302" cy="282" rx="7" ry="3.5" fill="#fef3c7" transform="rotate(-20 302 282)"/>
+                <ellipse cx="350" cy="260" rx="8" ry="4" fill="#fef3c7" transform="rotate(-5 350 260)"/>
+                <ellipse cx="402" cy="264" rx="7" ry="3.5" fill="#fef3c7" transform="rotate(12 402 264)"/>
+                <ellipse cx="448" cy="288" rx="7.5" ry="3.8" fill="#fef3c7" transform="rotate(25 448 288)"/>
+                <ellipse cx="330" cy="302" rx="6.5" ry="3.2" fill="#fef3c7" transform="rotate(-10 330 302)"/>
+                <ellipse cx="420" cy="298" rx="7" ry="3.5" fill="#fef3c7" transform="rotate(15 420 298)"/>
+
+                <!-- Face -->
+                <g class="burger-eye">
+                  <circle cx="332" cy="308" r="10" fill="#1e293b"/>
+                  <circle cx="408" cy="308" r="10" fill="#1e293b"/>
+                  <circle cx="335" cy="305" r="4" fill="#ffffff"/>
+                  <circle cx="411" cy="305" r="4" fill="#ffffff"/>
+                </g>
+                <ellipse cx="314" cy="319" rx="8" ry="5" fill="#ff5e7e" opacity="0.65"/>
+                <ellipse cx="426" cy="319" rx="8" ry="5" fill="#ff5e7e" opacity="0.65"/>
+                <path d="M354 317 Q370 330 386 317" fill="none" stroke="#1e293b" stroke-width="4.5" stroke-linecap="round"/>
+              </g>
+
+              <!-- GRILLED CORN ON THE COB -->
+              <g class="corn-side" transform="translate(515, 360)" filter="url(#clay-shadow)">
+                <ellipse cx="75" cy="102" rx="72" ry="14" fill="#000000" opacity="0.3"/>
+                <ellipse cx="75" cy="98" rx="78" ry="16" fill="#b45309"/>
+                <ellipse cx="75" cy="95" rx="72" ry="13" fill="#fef3c7"/>
+                <path d="M10 88 Q-10 65 15 45 Q35 70 20 90 Z" fill="url(#husk-grad)"/>
+                <rect x="25" y="48" width="105" height="38" rx="19" fill="url(#corn-grad)" transform="rotate(-12 77 67)"/>
+                
+                <g transform="rotate(-12 77 67)" fill="#ca8a04" opacity="0.65">
+                  <circle cx="38" cy="56" r="3"/> <circle cx="48" cy="56" r="3"/> <circle cx="58" cy="56" r="3"/> <circle cx="68" cy="56" r="3"/> <circle cx="78" cy="56" r="3"/> <circle cx="88" cy="56" r="3"/> <circle cx="98" cy="56" r="3"/>
+                  <circle cx="34" cy="67" r="3.2"/> <circle cx="44" cy="67" r="3.2"/> <circle cx="54" cy="67" r="3.2"/> <circle cx="64" cy="67" r="3.2"/> <circle cx="74" cy="67" r="3.2"/> <circle cx="84" cy="67" r="3.2"/> <circle cx="94" cy="67" r="3.2"/> <circle cx="104" cy="67" r="3.2"/>
+                  <circle cx="38" cy="78" r="3"/> <circle cx="48" cy="78" r="3"/> <circle cx="58" cy="78" r="3"/> <circle cx="68" cy="78" r="3"/> <circle cx="78" cy="78" r="3"/> <circle cx="88" cy="78" r="3"/> <circle cx="98" cy="78" r="3"/>
+                </g>
+
+                <g stroke="#78350f" stroke-width="2.5" stroke-linecap="round" opacity="0.45">
+                  <line x1="45" y1="42" x2="48" y2="78"/>
+                  <line x1="70" y1="38" x2="73" y2="74"/>
+                  <line x1="95" y1="34" x2="98" y2="70"/>
+                </g>
+
+                <rect x="68" y="44" width="20" height="14" rx="4" fill="#fef08a" transform="rotate(-5 78 51)"/>
+                <rect x="70" y="46" width="16" height="5" rx="2" fill="#ffffff" opacity="0.7"/>
+                <path d="M125 60 Q150 55 140 75 Q120 75 125 60 Z" fill="url(#husk-grad)"/>
+                <path class="steam-line" d="M78 40 Q82 28 78 18" fill="none" stroke="#ffffff" stroke-width="2"/>
+              </g>
+
+              <!-- INTERACTIVE DESK LAMP -->
+              <g id="lamp-switch-group">
+                <path d="M300 20 L400 55 L500 20" fill="none" stroke="#334155" stroke-width="14" stroke-linecap="round"/>
+                <circle cx="400" cy="55" r="16" fill="#1e293b"/>
+
+                <g id="lamp-head" filter="url(#clay-shadow)">
+                  <path d="M340 55 L460 55 L485 110 L315 110 Z" fill="#ffb830"/>
+                  <ellipse cx="400" cy="110" rx="85" ry="16" fill="#f8fafc"/>
+                  <ellipse id="lamp-bulb" cx="400" cy="110" rx="28" ry="13" fill="#ffea79"/>
+                </g>
+
+                <g id="lamp-cord-line">
+                  <line x1="455" y1="110" x2="455" y2="190" stroke="#cbd5e1" stroke-width="3.5" stroke-dasharray="6,4"/>
+                  <circle cx="455" cy="196" r="9" fill="#ff5e7e" filter="url(#clay-shadow)"/>
+                </g>
+              </g>
+
+              <!-- PROPS & BADGES -->
+              <g transform="translate(110, 385)">
+                <rect x="0" y="58" width="65" height="14" rx="4" fill="#ff5e7e"/>
+                <rect x="5" y="44" width="56" height="14" rx="4" fill="#38ef7d"/>
+                <path d="M18 44 L44 44 L39 22 L23 22 Z" fill="#f8fafc"/>
+                <circle cx="21" cy="12" r="12" fill="#22c55e"/>
+                <circle cx="36" cy="10" r="14" fill="#15803d"/>
+                <circle cx="30" cy="16" r="9" fill="#4ade80"/>
+              </g>
+
+              <g transform="translate(90, 160)" class="floating-badge badge-left" filter="url(#clay-shadow)">
+                <polygon points="26,0 52,13 52,39 26,52 0,39 0,13" fill="#ff5e7e"/>
+              </g>
+
+              <g transform="translate(670, 170)" class="floating-badge badge-right" filter="url(#clay-shadow)">
+                <polygon points="26,0 52,13 52,39 26,52 0,39 0,13" fill="#38ef7d"/>
+              </g>
+            </svg>
+          </div>
+        </div>
+
+      </main>
+
+      <a href="#about-section" class="scroll-down-hint">
+        <span>About Us</span>
+        <svg viewBox="0 0 24 24"><path d="M7 10l5 5 5-5"/></svg>
+      </a>
+    </section>
+  </div>
+
+  <!-- ==========================================================================
+     2. ABOUT SECTION (Crisp White Background + Jam Toast Character & Typing)
+     ========================================================================== -->
+  <section class="about-section" id="about-section">
+    <div class="about-container">
+      
+      <!-- Character SVG Illustration -->
+      <div class="about-character-box">
+        <svg class="about-character-svg" viewBox="0 0 500 500" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="toast-body-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#fef08a"/>
+              <stop offset="100%" stop-color="#d97706"/>
+            </linearGradient>
+            <linearGradient id="jam-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#ff7597"/>
+              <stop offset="100%" stop-color="#e11d48"/>
+            </linearGradient>
+            <filter id="toast-shadow" x="-20%" y="-20%" width="140%" height="140%">
+              <feDropShadow dx="0" dy="16" stdDeviation="12" flood-color="#050814" flood-opacity="0.22"/>
+            </filter>
+          </defs>
+
+          <!-- Drop Shadow Base -->
+          <ellipse cx="250" cy="460" rx="90" ry="16" fill="#000000" opacity="0.2"/>
+
+          <g filter="url(#toast-shadow)">
+            <!-- Arms -->
+            <rect x="100" y="270" width="80" height="24" rx="12" fill="#d97706"/>
+            <circle cx="106" cy="282" r="10" fill="#fbbf24"/>
+            <rect x="320" y="270" width="80" height="24" rx="12" fill="#d97706"/>
+            <circle cx="394" cy="282" r="10" fill="#fbbf24"/>
+
+            <!-- Legs -->
+            <rect x="208" y="380" width="24" height="65" rx="12" fill="#d97706"/>
+            <rect x="268" y="380" width="24" height="65" rx="12" fill="#d97706"/>
+
+            <!-- Main Toast Body -->
+            <rect x="140" y="80" width="220" height="310" rx="40" fill="url(#toast-body-grad)" stroke="#b45309" stroke-width="10"/>
+
+            <!-- Strawberry Jam Topping -->
+            <path d="M170 140 C170 120, 330 120, 330 140 C350 140, 350 320, 330 320 C330 340, 170 340, 170 320 C150 320, 150 140, 170 140 Z" fill="url(#jam-grad)"/>
+            <!-- Wavy Jam Details -->
+            <circle cx="185" cy="160" r="18" fill="#ff5e7e"/>
+            <circle cx="315" cy="170" r="22" fill="#ff5e7e"/>
+            <circle cx="180" cy="290" r="24" fill="#ff5e7e"/>
+            <circle cx="320" cy="280" r="20" fill="#ff5e7e"/>
+
+            <!-- Eyes -->
+            <circle cx="215" cy="210" r="22" fill="#ffffff"/>
+            <circle cx="218" cy="210" r="12" fill="#0f172a"/>
+            <circle cx="222" cy="204" r="4" fill="#ffffff"/>
+
+            <circle cx="285" cy="210" r="22" fill="#ffffff"/>
+            <circle cx="288" cy="210" r="12" fill="#0f172a"/>
+            <circle cx="292" cy="204" r="4" fill="#ffffff"/>
+
+            <!-- Smile -->
+            <path d="M238 236 Q250 252 262 236" fill="none" stroke="#0f172a" stroke-width="6" stroke-linecap="round"/>
+          </g>
+        </svg>
+      </div>
+
+      <!-- About Text & Typing Animation -->
+      <div class="about-content-box">
+      
+        <h2 class="about-title">SWEET &amp; CRAFTED</h2>
+        <div class="about-typing-wrapper">
+          <span class="typing-text" id="about-typing-text"></span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+     3. MENU SECTION (Crisp White Background + 3D Coverflow Card Slider)
+     ========================================================================== -->
+  <section class="menu-section" id="menu-section">
+    <div class="menu-container">
+      
+      <div class="menu-header">
+       
+        <h2 class="menu-title">OUR MENU</h2>
+        <p class="menu-subtitle">Swipe or click through our handcrafted collection of 3D clay food creations.</p>
+      </div>
+
+      <!-- 3D COVERFLOW VIEWPORT -->
+      <div class="coverflow-viewport" id="coverflow-viewport">
+        <div class="coverflow-track" id="coverflow-track">
+          
+          <!-- CARD 1: THE SIGNATURE BUN -->
+          <div class="coverflow-card" data-index="0">
+            <div class="card-img-box">
+              <span class="card-price-tag">$14.50</span>
+              <svg viewBox="0 0 200 160">
+                <rect x="40" y="110" width="120" height="25" rx="12" fill="#fbbf24"/>
+                <rect x="35" y="90" width="130" height="20" rx="10" fill="#78350f"/>
+                <path d="M30 85 Q50 95 70 85 Q90 95 110 85 Q130 95 150 85 Q170 95 175 85 L170 92 L30 92 Z" fill="#eab308"/>
+                <rect x="38" y="70" width="124" height="15" rx="7" fill="#ff5e7e"/>
+                <path d="M30 65 C30 15, 170 15, 170 65 Z" fill="#fde047"/>
+                <ellipse cx="70" cy="40" rx="4" ry="2" fill="#ffffff"/>
+                <ellipse cx="100" cy="30" rx="4" ry="2" fill="#ffffff"/>
+                <ellipse cx="130" cy="42" rx="4" ry="2" fill="#ffffff"/>
+              </svg>
+            </div>
+            <div class="card-body">
+              <div>
+                <h3 class="card-item-title">THE SIGNATURE BUN</h3>
+                <p class="card-item-desc">Double clay patty, melted sharp cheddar, ripe tomato &amp; signature house secret sauce on toasted brioche.</p>
+              </div>
+              <button class="order-now-btn">Order Now</button>
+            </div>
+          </div>
+
+          <!-- CARD 2: BUTTER CORN COB -->
+          <div class="coverflow-card" data-index="1">
+            <div class="card-img-box">
+              <span class="card-price-tag">$7.00</span>
+              <svg viewBox="0 0 200 160">
+                <rect x="30" y="65" width="140" height="40" rx="20" fill="#eab308" transform="rotate(-10 100 85)"/>
+                <rect x="85" y="58" width="30" height="20" rx="5" fill="#fef08a" transform="rotate(-5 100 68)"/>
+                <path d="M15 85 Q0 60 35 45 Q50 70 30 95 Z" fill="#22c55e"/>
+                <path d="M165 75 Q190 70 175 95 Q155 95 165 75 Z" fill="#15803d"/>
+              </svg>
+            </div>
+            <div class="card-body">
+              <div>
+                <h3 class="card-item-title">BUTTER CORN COB</h3>
+                <p class="card-item-desc">Fire-grilled sweet corn brushed with whipped clay butter, sea salt &amp; smoked paprika rust.</p>
+              </div>
+              <button class="order-now-btn">Order Now</button>
+            </div>
+          </div>
+
+          <!-- CARD 3: CRUNCHY GOLDEN FRIES -->
+          <div class="coverflow-card" data-index="2">
+            <div class="card-img-box">
+              <span class="card-price-tag">$6.50</span>
+              <svg viewBox="0 0 200 160">
+                <path d="M50 70 L150 70 L135 140 L65 140 Z" fill="#ff5e7e"/>
+                <rect x="65" y="20" width="12" height="60" rx="6" fill="#fde047" transform="rotate(-15 70 50)"/>
+                <rect x="85" y="15" width="12" height="65" rx="6" fill="#fbbf24"/>
+                <rect x="105" y="10" width="12" height="70" rx="6" fill="#fde047" transform="rotate(8 110 45)"/>
+                <rect x="125" y="25" width="12" height="55" rx="6" fill="#fbbf24" transform="rotate(18 130 50)"/>
+              </svg>
+            </div>
+            <div class="card-body">
+              <div>
+                <h3 class="card-item-title">GOLDEN FRIES</h3>
+                <p class="card-item-desc">Hand-cut double cooked clay potatoes dusted with truffle salt &amp; served with garlic dip.</p>
+              </div>
+              <button class="order-now-btn">Order Now</button>
+            </div>
+          </div>
+
+          <!-- CARD 4: VELVET STRAWBERRY SHAKE -->
+          <div class="coverflow-card" data-index="3">
+            <div class="card-img-box">
+              <span class="card-price-tag">$8.00</span>
+              <svg viewBox="0 0 200 160">
+                <path d="M65 45 L135 45 L125 145 L75 145 Z" fill="rgba(0,0,0,0.06)"/>
+                <path d="M70 55 L130 55 L122 140 L78 140 Z" fill="#ff5e7e"/>
+                <path d="M60 45 C60 25, 140 25, 140 45 Z" fill="#ffffff"/>
+                <rect x="105" y="5" width="8" height="50" rx="4" fill="#38ef7d" transform="rotate(15 105 25)"/>
+                <circle cx="100" cy="25" r="8" fill="#e11d48"/>
+              </svg>
+            </div>
+            <div class="card-body">
+              <div>
+                <h3 class="card-item-title">VELVET SHAKE</h3>
+                <p class="card-item-desc">Thick spun strawberry clay cream topped with whipped vanilla cloud &amp; a maraschino cherry.</p>
+              </div>
+              <button class="order-now-btn">Order Now</button>
+            </div>
+          </div>
+
+          <!-- CARD 5: GLAZED CLAY DONUT -->
+          <div class="coverflow-card" data-index="4">
+            <div class="card-img-box">
+              <span class="card-price-tag">$5.50</span>
+              <svg viewBox="0 0 200 160">
+                <ellipse cx="100" cy="85" rx="65" ry="45" fill="#d97706"/>
+                <ellipse cx="100" cy="80" rx="60" ry="40" fill="#ff5e7e"/>
+                <ellipse cx="100" cy="82" rx="20" ry="14" fill="#ffffff"/>
+                <circle cx="75" cy="65" r="3.5" fill="#ffea79"/>
+                <circle cx="125" cy="70" r="3.5" fill="#38ef7d"/>
+                <circle cx="90" cy="55" r="3.5" fill="#ffffff"/>
+                <circle cx="115" cy="95" r="3.5" fill="#ffea79"/>
+              </svg>
+            </div>
+            <div class="card-body">
+              <div>
+                <h3 class="card-item-title">GLAZED DONUT</h3>
+                <p class="card-item-desc">Fluffy fried dough ring dipped in glossy berry glaze and topped with rainbow clay sprinkles.</p>
+              </div>
+              <button class="order-now-btn">Order Now</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- CONTROLS & PAGINATION -->
+      <div class="coverflow-controls">
+        <button class="coverflow-nav-btn" id="coverflow-prev" aria-label="Previous Item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+
+        <div class="coverflow-dots" id="coverflow-dots"></div>
+
+        <button class="coverflow-nav-btn" id="coverflow-next" aria-label="Next Item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 18l6-6-6-6"/></svg>
+        </button>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+     4. JAVASCRIPT ENGINE
+     ========================================================================== -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // -----------------------------------------------------------------------
+      // ABOUT SECTION TYPING ANIMATION
+      // -----------------------------------------------------------------------
+      const aboutTypingElement = document.getElementById('about-typing-text');
+      const aboutPhrase = "Welcome to BUN & CRAFT! We blend imagination and artisanal 3D design to bring you delicious digital culinary experiences. Meet our friendly toast mascot spreading sweetness one bite at a time!";
+      let aboutCharIndex = 0;
+      let typingStarted = false;
+
+      function typeAboutText() {
+        if (aboutCharIndex < aboutPhrase.length) {
+          aboutTypingElement.textContent += aboutPhrase.charAt(aboutCharIndex);
+          aboutCharIndex++;
+          setTimeout(typeAboutText, 35);
+        }
+      }
+
+      // Trigger typing when scrolled into view
+      const aboutSection = document.getElementById('about-section');
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting && !typingStarted) {
+            typingStarted = true;
+            setTimeout(typeAboutText, 300);
+          }
+        });
+      }, { threshold: 0.3 });
+
+      if (aboutSection) {
+        observer.observe(aboutSection);
+      }
+
+      // -----------------------------------------------------------------------
+      // A. MOUSE PARALLAX & TILT LOGIC (HERO SCOPE)
+      // -----------------------------------------------------------------------
+      const heroWrapper = document.getElementById('hero-wrapper');
+      const sceneContainer = document.getElementById('scene-container');
+      const sceneWrapper = document.getElementById('scene-wrapper');
+      const brandContainer = document.getElementById('brand-title-container');
+      const glow1 = document.getElementById('glow-1');
+      const glow2 = document.getElementById('glow-2');
+      const glow3 = document.getElementById('glow-3');
+
+      let mouseX = window.innerWidth / 2;
+      let mouseY = window.innerHeight / 2;
+
+      window.addEventListener('mousemove', (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+
+        document.documentElement.style.setProperty('--mouse-x', `${mouseX}px`);
+        document.documentElement.style.setProperty('--mouse-y', `${mouseY}px`);
+
+        const offsetX = (mouseX - window.innerWidth / 2) * 0.025;
+        const offsetY = (mouseY - window.innerHeight / 2) * 0.025;
+
+        if (glow1) glow1.style.transform = `translate(${offsetX * 1.5}px, ${offsetY * 1.5}px)`;
+        if (glow2) glow2.style.transform = `translate(${-offsetX * 1.2}px, ${-offsetY * 1.2}px)`;
+        if (glow3) glow3.style.transform = `translate(${offsetX}px, ${-offsetY}px)`;
+
+        // Scene 3D Tilt
+        if (sceneContainer) {
+          const rect = sceneContainer.getBoundingClientRect();
+          const centerX = rect.left + rect.width / 2;
+          const centerY = rect.top + rect.height / 2;
+          const rotateX = (e.clientY - centerY) * -0.015;
+          const rotateY = (e.clientX - centerX) * 0.015;
+
+          sceneWrapper.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+        }
+
+        // Brand Text 3D Tilt
+        if (brandContainer) {
+          const rotateX = (e.clientY - window.innerHeight / 2) * -0.01;
+          const rotateY = (e.clientX - window.innerWidth / 2) * 0.01;
+          brandContainer.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+        }
+      });
+
+      // -----------------------------------------------------------------------
+      // B. LAMP CLICK TOGGLE (DAY / NIGHT MODE)
+      // -----------------------------------------------------------------------
+      const lampSwitchGroup = document.getElementById('lamp-switch-group');
+      const lampBulb = document.getElementById('lamp-bulb');
+      let isLampOn = true;
+
+      if (lampSwitchGroup) {
+        lampSwitchGroup.addEventListener('click', (e) => {
+          e.stopPropagation();
+          isLampOn = !isLampOn;
+
+          if (isLampOn) {
+            document.body.classList.remove('lamp-off');
+            lampBulb.setAttribute('fill', '#ffea79');
+          } else {
+            document.body.classList.add('lamp-off');
+            lampBulb.setAttribute('fill', '#475569');
+          }
+        });
+      }
+
+      // -----------------------------------------------------------------------
+      // C. TRUE 3D COVERFLOW CARD SLIDER ENGINE
+      // -----------------------------------------------------------------------
+      const cards = Array.from(document.querySelectorAll('.coverflow-card'));
+      const dotsContainer = document.getElementById('coverflow-dots');
+      const prevBtn = document.getElementById('coverflow-prev');
+      const nextBtn = document.getElementById('coverflow-next');
+      const viewport = document.getElementById('coverflow-viewport');
+
+      let activeIndex = 0;
+      const totalCards = cards.length;
+
+      // Create Pagination Dots
+      cards.forEach((_, idx) => {
+        const dot = document.createElement('div');
+        dot.classList.add('dot');
+        if (idx === 0) dot.classList.add('active');
+        dot.addEventListener('click', () => goToCard(idx));
+        dotsContainer.appendChild(dot);
+      });
+
+      const dots = Array.from(dotsContainer.querySelectorAll('.dot'));
+
+      function updateCoverflow() {
+        const isMobile = window.innerWidth < 768;
+        const xOffsetStep = isMobile ? 180 : 220;
+
+        cards.forEach((card, i) => {
+          const offset = i - activeIndex;
+          const absOffset = Math.abs(offset);
+
+          card.classList.remove('active');
+
+          if (offset === 0) {
+            // ACTIVE CENTER CARD
+            card.style.transform = `translateX(0px) translateZ(120px) rotateY(0deg) scale(1)`;
+            card.style.opacity = '1';
+            card.style.zIndex = '10';
+            card.style.filter = 'none';
+            card.classList.add('active');
+          } else {
+            // SIDE CARDS CURVING INTO 3D DEPTH
+            const dir = offset > 0 ? 1 : -1;
+            const rotateY = dir * (isMobile ? -25 : -32);
+            const translateX = offset * xOffsetStep;
+            const translateZ = -120 * absOffset;
+            const scale = Math.max(0.72, 1 - absOffset * 0.15);
+            const opacity = Math.max(0.2, 1 - absOffset * 0.35);
+
+            card.style.transform = `translateX(${translateX}px) translateZ(${translateZ}px) rotateY(${rotateY}deg) scale(${scale})`;
+            card.style.opacity = opacity.toString();
+            card.style.zIndex = (10 - absOffset).toString();
+            card.style.filter = absOffset > 1 ? 'blur(2px)' : 'none';
+          }
+        });
+
+        // Update Dots
+        dots.forEach((dot, idx) => {
+          dot.classList.toggle('active', idx === activeIndex);
+        });
+      }
+
+      function goToCard(index) {
+        activeIndex = (index + totalCards) % totalCards;
+        updateCoverflow();
+      }
+
+      // Card Click Listener to Center
+      cards.forEach((card, idx) => {
+        card.addEventListener('click', () => {
+          if (idx !== activeIndex) {
+            goToCard(idx);
+          }
+        });
+      });
+
+      // Navigation Buttons
+      if (prevBtn) prevBtn.addEventListener('click', () => goToCard(activeIndex - 1));
+      if (nextBtn) nextBtn.addEventListener('click', () => goToCard(activeIndex + 1));
+
+      // Keyboard Arrow Navigation
+      window.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowLeft') goToCard(activeIndex - 1);
+        if (e.key === 'ArrowRight') goToCard(activeIndex + 1);
+      });
+
+      // Touch Swipe Support
+      let touchStartX = 0;
+      let touchEndX = 0;
+
+      if (viewport) {
+        viewport.addEventListener('touchstart', (e) => {
+          touchStartX = e.changedTouches[0].screenX;
+        }, { passive: true });
+
+        viewport.addEventListener('touchend', (e) => {
+          touchEndX = e.changedTouches[0].screenX;
+          const diff = touchStartX - touchEndX;
+          if (Math.abs(diff) > 40) {
+            if (diff > 0) goToCard(activeIndex + 1);
+            else goToCard(activeIndex - 1);
+          }
+        }, { passive: true });
+      }
+
+      window.addEventListener('resize', updateCoverflow);
+      updateCoverflow();
+
+      // -----------------------------------------------------------------------
+      // D. LIVING CANVAS (BUBBLES, RIPPLES & AMBIENT FIREFLIES)
+      // -----------------------------------------------------------------------
+      const canvas = document.getElementById('bg-canvas');
+      const ctx = canvas.getContext('2d');
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+      let width = 0;
+      let height = 0;
+
+      function resizeCanvas() {
+        if (!heroWrapper) return;
+        width = heroWrapper.clientWidth;
+        height = heroWrapper.clientHeight;
+        canvas.width = width * dpr;
+        canvas.height = height * dpr;
+        ctx.scale(dpr, dpr);
+      }
+      resizeCanvas();
+      window.addEventListener('resize', resizeCanvas);
+
+      // Pre-rendered bubble sprites
+      const bubbleSprites = [];
+      const colors = ['#ffea79', '#ffb830', '#ff5e7e', '#38ef7d', '#ffffff'];
+
+      colors.forEach((color) => {
+        const sCanvas = document.createElement('canvas');
+        const sSize = 64;
+        sCanvas.width = sSize;
+        sCanvas.height = sSize;
+        const sCtx = sCanvas.getContext('2d');
+
+        const grad = sCtx.createRadialGradient(
+          sSize * 0.35, sSize * 0.35, sSize * 0.05,
+          sSize * 0.5, sSize * 0.5, sSize * 0.45
+        );
+        grad.addColorStop(0, '#ffffff');
+        grad.addColorStop(0.45, color);
+        grad.addColorStop(1, 'rgba(0,0,0,0.12)');
+
+        sCtx.fillStyle = grad;
+        sCtx.beginPath();
+        sCtx.arc(sSize / 2, sSize / 2, sSize * 0.45, 0, Math.PI * 2);
+        sCtx.fill();
+
+        bubbleSprites.push(sCanvas);
+      });
+
+      // Particle Classes
+      const bubbles = [];
+      const numBubbles = Math.min(Math.floor(window.innerWidth / 24), 45);
+
+      class Bubble {
+        constructor(isBurst = false, burstX = 0, burstY = 0) {
+          this.reset(isBurst, burstX, burstY);
+        }
+
+        reset(isBurst = false, burstX = 0, burstY = 0) {
+          this.isBurst = isBurst;
+          this.x = isBurst ? burstX : Math.random() * width;
+          this.y = isBurst ? burstY : height + Math.random() * 80;
+          this.layer = Math.floor(Math.random() * 3) + 1;
+          this.radius = isBurst ? Math.random() * 10 + 5 : (this.layer * 8) + Math.random() * 8;
+          this.speedY = isBurst ? (Math.random() - 0.5) * 7 : -(0.25 + this.layer * 0.2);
+          this.speedX = isBurst ? (Math.random() - 0.5) * 7 : (Math.random() - 0.5) * 0.4;
+          this.gravity = isBurst ? 0.18 : 0;
+          this.spriteIdx = Math.floor(Math.random() * bubbleSprites.length);
+          this.opacity = isBurst ? 1 : 0.18 + this.layer * 0.18;
+        }
+
+        update() {
+          const dx = mouseX - this.x;
+          const dy = mouseY - this.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          const maxDist = 120;
+
+          if (dist < maxDist && !this.isBurst) {
+            const force = (maxDist - dist) / maxDist;
+            this.x -= (dx / dist) * force * 4;
+            this.y -= (dy / dist) * force * 4;
+          }
+
+          if (this.isBurst) {
+            this.speedY += this.gravity;
+            this.opacity -= 0.016;
+          }
+
+          this.x += this.speedX + (mouseX - width / 2) * 0.0004 * this.layer;
+          this.y += this.speedY;
+
+          if ((!this.isBurst && this.y < -40) || (this.isBurst && this.opacity <= 0)) {
+            if (this.isBurst) {
+              const idx = bubbles.indexOf(this);
+              if (idx > -1) bubbles.splice(idx, 1);
+            } else {
+              this.reset();
+            }
+          }
+        }
+
+        draw() {
+          ctx.save();
+          ctx.globalAlpha = isLampOn ? this.opacity : this.opacity * 0.25;
+          const sprite = bubbleSprites[this.spriteIdx];
+          const size = this.radius * 2;
+          ctx.drawImage(sprite, this.x - this.radius, this.y - this.radius, size, size);
+          ctx.restore();
+        }
+      }
+
+      for (let i = 0; i < numBubbles; i++) {
+        const b = new Bubble();
+        b.y = Math.random() * height;
+        bubbles.push(b);
+      }
+
+      // Ambient Fireflies
+      const fireflies = [];
+      for (let i = 0; i < 30; i++) {
+        fireflies.push({
+          x: Math.random() * width,
+          y: Math.random() * height,
+          radius: Math.random() * 2.2 + 1,
+          alpha: Math.random(),
+          speedAlpha: 0.01 + Math.random() * 0.02,
+          vx: (Math.random() - 0.5) * 0.4,
+          vy: (Math.random() - 0.5) * 0.4
+        });
+      }
+
+      // Click Ripples
+      const ripples = [];
+      heroWrapper.addEventListener('click', (e) => {
+        ripples.push({ x: e.clientX, y: e.clientY, radius: 4, opacity: 0.75 });
+        for (let i = 0; i < 12; i++) {
+          bubbles.push(new Bubble(true, e.clientX, e.clientY));
+        }
+      });
+
+      function drawRipples() {
+        for (let i = ripples.length - 1; i >= 0; i--) {
+          const r = ripples[i];
+          r.radius += 3.2;
+          r.opacity -= 0.022;
+
+          if (r.opacity <= 0) {
+            ripples.splice(i, 1);
+            continue;
+          }
+
+          ctx.save();
+          ctx.beginPath();
+          ctx.arc(r.x, r.y, r.radius, 0, Math.PI * 2);
+          ctx.strokeStyle = `rgba(255, 255, 255, ${r.opacity})`;
+          ctx.lineWidth = 2;
+          ctx.stroke();
+          ctx.restore();
+        }
+      }
+
+      function drawFireflies() {
+        if (isLampOn) return;
+
+        fireflies.forEach(f => {
+          f.x += f.vx;
+          f.y += f.vy;
+          f.alpha += f.speedAlpha;
+
+          if (f.alpha >= 1 || f.alpha <= 0) f.speedAlpha = -f.speedAlpha;
+          if (f.x < 0) f.x = width;
+          if (f.x > width) f.x = 0;
+          if (f.y < 0) f.y = height;
+          if (f.y > height) f.y = 0;
+
+          ctx.save();
+          ctx.beginPath();
+          ctx.arc(f.x, f.y, f.radius, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(255, 234, 121, ${Math.max(0, f.alpha)})`;
+          ctx.shadowBlur = 10;
+          ctx.shadowColor = '#ffea79';
+          ctx.fill();
+          ctx.restore();
+        });
+      }
+
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      let isTabActive = true;
+
+      document.addEventListener('visibilitychange', () => {
+        isTabActive = !document.hidden;
+      });
+
+      // Animation Loop
+      function renderLoop() {
+        if (isTabActive && !prefersReducedMotion) {
+          ctx.clearRect(0, 0, width, height);
+
+          drawRipples();
+
+          bubbles.forEach(b => {
+            b.update();
+            b.draw();
+          });
+
+          drawFireflies();
+        }
+
+        requestAnimationFrame(renderLoop);
+      }
+
+      requestAnimationFrame(renderLoop);
+    });
+  </script>
+</body>
+</html>
